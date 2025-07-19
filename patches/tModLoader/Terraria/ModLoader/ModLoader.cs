@@ -59,7 +59,7 @@ public static class ModLoader
 	internal static readonly string modBrowserPublicKey = "<RSAKeyValue><Modulus>oCZObovrqLjlgTXY/BKy72dRZhoaA6nWRSGuA+aAIzlvtcxkBK5uKev3DZzIj0X51dE/qgRS3OHkcrukqvrdKdsuluu0JmQXCv+m7sDYjPQ0E6rN4nYQhgfRn2kfSvKYWGefp+kqmMF9xoAq666YNGVoERPm3j99vA+6EIwKaeqLB24MrNMO/TIf9ysb0SSxoV8pC/5P/N6ViIOk3adSnrgGbXnFkNQwD0qsgOWDks8jbYyrxUFMc4rFmZ8lZKhikVR+AisQtPGUs3ruVh4EWbiZGM2NOkhOCOM4k1hsdBOyX2gUliD0yjK5tiU3LBqkxoi2t342hWAkNNb4ZxLotw==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
 	internal static string modBrowserPassphrase = "";
 
-	internal static bool autoReloadAndEnableModsLeavingModBrowser = true;
+	internal static bool autoReloadAndEnableModsLeavingModBrowser = true; // Currently unimplemented
 	internal static bool autoReloadRequiredModsLeavingModsScreen = true;
 	internal static bool removeForcedMinimumZoom;
 	internal static int attackSpeedScalingTooltipVisibility = 1; // Shown, WhenNonZero, Hidden

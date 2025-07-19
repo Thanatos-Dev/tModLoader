@@ -37,6 +37,7 @@ namespace ExampleMod.Content.Tiles.Furniture
 
 			DustType = ModContent.DustType<Sparkle>();
 			AdjTiles = [TileID.Containers];
+			VanillaFallbackOnModDeletion = TileID.Containers;
 
 			// Other tiles with just one map entry use CreateMapEntryName() to use the default translationkey, "MapEntry"
 			// Since ExampleChest needs multiple, we register our own MapEntry keys
@@ -180,7 +181,7 @@ namespace ExampleMod.Content.Tiles.Furniture
 			}
 
 			if (player.editedChestName) {
-				NetMessage.SendData(MessageID.SyncPlayerChest, -1, -1, NetworkText.FromLiteral(Main.chest[player.chest].name), player.chest, 1f);
+				NetMessage.SendData(MessageID.SyncPlayerChest, text: NetworkText.FromLiteral(Main.chest[player.chest].name), number: player.chest, number2: 1f);
 				player.editedChestName = false;
 			}
 
@@ -192,7 +193,7 @@ namespace ExampleMod.Content.Tiles.Furniture
 					SoundEngine.PlaySound(SoundID.MenuClose);
 				}
 				else {
-					NetMessage.SendData(MessageID.RequestChestOpen, -1, -1, null, left, top);
+					NetMessage.SendData(MessageID.RequestChestOpen, number: left, number2: top);
 					Main.stackSplit = 600;
 				}
 			}
@@ -202,7 +203,8 @@ namespace ExampleMod.Content.Tiles.Furniture
 					int key = ModContent.ItemType<ExampleChestKey>();
 					if (player.HasItemInInventoryOrOpenVoidBag(key) && Chest.Unlock(left, top) && player.ConsumeItem(key, includeVoidBag: true)) {
 						if (Main.netMode == NetmodeID.MultiplayerClient) {
-							NetMessage.SendData(MessageID.LockAndUnlock, -1, -1, null, player.whoAmI, 1f, left, top);
+							// The 1 value of the number2 parameter is for unlocking chests.
+							NetMessage.SendData(MessageID.LockAndUnlock, number2: 1f, number3: left, number4: top);
 						}
 					}
 				}

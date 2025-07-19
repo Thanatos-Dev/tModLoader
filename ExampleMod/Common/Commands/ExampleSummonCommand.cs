@@ -1,9 +1,9 @@
-﻿using Terraria;
+﻿using System.Linq;
+using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using System.Linq;
 
 namespace ExampleMod.Common.Commands
 {
@@ -101,7 +101,7 @@ namespace ExampleMod.Common.Commands
 
 				// Sync of NPCs on the server in MP
 				if (Main.netMode == NetmodeID.Server && slot < Main.maxNPCs) {
-					NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, slot);
+					NetMessage.SendData(MessageID.SyncNPC, number: slot);
 				}
 			}
 		}

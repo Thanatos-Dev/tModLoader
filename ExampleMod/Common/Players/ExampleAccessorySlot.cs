@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ExampleMod.Common.Configs;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -23,6 +24,7 @@ namespace ExampleMod.Common.Players
 		// Background Textures -> In general, you can use most of the existing vanilla ones to get different colors
 		public override string VanityBackgroundTexture => "Terraria/Images/Inventory_Back14"; // yellow
 		public override string FunctionalBackgroundTexture => "Terraria/Images/Inventory_Back7"; // pale blue
+		public override string DyeBackgroundTexture => "Terraria/Images/Inventory_Back13"; // white. Since it is white, the color assigned in BackgroundDrawColor will be the exact color it appears as.
 
 		// Icon textures. Nominal image size is 32x32. Piggy bank is 16x24 but it still works as it's drawn centered.
 		public override string VanityTexture => "Terraria/Images/Item_" + ItemID.PiggyBank;
@@ -31,12 +33,22 @@ namespace ExampleMod.Common.Players
 		public override bool IsHidden() {
 			return IsEmpty; // Only show when it contains an item, items can end up in functional slots via quick swap (right click accessory)
 		}
+
+		public override void BackgroundDrawColor(AccessorySlotType context, ref Color color) {
+			if (context == AccessorySlotType.DyeSlot) {
+				color = Main.DiscoColor * (Main.invAlpha / 255);
+			}
+		}
 	}
 
 	public class ExampleModWingSlot : ModAccessorySlot
 	{
 		public static LocalizedText WingsText { get; private set; }
 		public static LocalizedText WingsDyeText { get; private set; }
+
+		// This slot can toggle between supporting loadouts and not supporting loadouts. By not supporting loadouts, a player would only need to craft a single Wing instead of one for each loadout they plan to switch between.
+		// This setting must be server-side and requires a reload if changed.
+		public override bool HasEquipmentLoadoutSupport => ModContent.GetInstance<ExampleModConfig>().WingSlotLoadoutSupportToggle;
 
 		public override void SetupContent() {
 			WingsText = Mod.GetLocalization($"{nameof(ExampleModWingSlot)}.Wings");

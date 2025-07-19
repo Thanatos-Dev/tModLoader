@@ -23,7 +23,12 @@ public abstract class ModBlockType : ModTexturedType, ILocalizedModType
 	/// <para/> Defaults to 0, which is <see cref="DustID.Dirt"/>. To prevent spawning any hit dust, set this to -1 instead. </summary>
 	public int DustType { get; set; }
 
-	/// <summary> The vanilla ID of what should replace the instance when a user unloads and subsequently deletes data from your mod in their save file. Defaults to 0. </summary>
+	/// <summary>
+	/// The vanilla ID of what should replace the instance when a user unloads and subsequently deletes data from your mod in their save file.
+	/// <br/><br/> <see cref="Main.tileFrameImportant"/> tiles attempting to fallback to a vanilla <see cref="Main.tileFrameImportant"/> tile need to match the layout (FrameX and FrameY values) of the fallback tile so that the resulting tiles aren't broken.
+	/// <br/><br/> Also note that tiles with ModTileEntity won't be able to fallback to a working vanilla Tile+TileEntity. The user will have to mine and replace the tile to spawn the correct TileEntity.
+	/// <br/><br/> Defaults to <see cref="TileID.Dirt"/> (0).
+	/// </summary>
 	public ushort VanillaFallbackOnModDeletion { get; set; } = 0;
 
 	public abstract string LocalizationCategory { get; }

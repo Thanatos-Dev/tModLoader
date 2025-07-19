@@ -79,8 +79,12 @@ public static class TileLoader
 	private static Func<int, int, int, SpriteBatch, bool>[] HookPreDraw;
 	private delegate void DelegateDrawEffects(int i, int j, int type, SpriteBatch spriteBatch, ref TileDrawInfo drawData);
 	private static DelegateDrawEffects[] HookDrawEffects;
+	private static Action<int, int, Tile, ushort, short, short, Color, bool>[] HookEmitParticles;
 	private static Action<int, int, int, SpriteBatch>[] HookPostDraw;
 	private static Action<int, int, int, SpriteBatch>[] HookSpecialDraw;
+	private delegate bool DelegatePreDrawPlacementPreview(int i, int j, int type, SpriteBatch spriteBatch, ref Rectangle frame, ref Vector2 position, ref Color color, bool validPlacement, ref SpriteEffects spriteEffects);
+	private static DelegatePreDrawPlacementPreview[] HookPreDrawPlacementPreview;
+	private static Action<int, int, int, SpriteBatch, Rectangle, Vector2, Color, bool, SpriteEffects>[] HookPostDrawPlacementPreview;
 	private static Action<int, int, int>[] HookRandomUpdate;
 	private delegate bool DelegateTileFrame(int i, int j, int type, ref bool resetFrame, ref bool noBreak);
 	private static DelegateTileFrame[] HookTileFrame;
@@ -231,8 +235,11 @@ public static class TileLoader
 		ModLoader.BuildGlobalHook(ref HookAnimateTile, globalTiles, g => g.AnimateTile);
 		ModLoader.BuildGlobalHook(ref HookPreDraw, globalTiles, g => g.PreDraw);
 		ModLoader.BuildGlobalHook<GlobalTile, DelegateDrawEffects>(ref HookDrawEffects, globalTiles, g => g.DrawEffects);
+		ModLoader.BuildGlobalHook(ref HookEmitParticles, globalTiles, g => g.EmitParticles);
 		ModLoader.BuildGlobalHook(ref HookPostDraw, globalTiles, g => g.PostDraw);
 		ModLoader.BuildGlobalHook(ref HookSpecialDraw, globalTiles, g => g.SpecialDraw);
+		ModLoader.BuildGlobalHook<GlobalTile, DelegatePreDrawPlacementPreview>(ref HookPreDrawPlacementPreview, globalTiles, g => g.PreDrawPlacementPreview);
+		ModLoader.BuildGlobalHook(ref HookPostDrawPlacementPreview, globalTiles, g => g.PostDrawPlacementPreview);
 		ModLoader.BuildGlobalHook(ref HookRandomUpdate, globalTiles, g => g.RandomUpdate);
 		ModLoader.BuildGlobalHook<GlobalTile, DelegateTileFrame>(ref HookTileFrame, globalTiles, g => g.TileFrame);
 		ModLoader.BuildGlobalHook(ref HookCanPlace, globalTiles, g => g.CanPlace);
@@ -271,6 +278,7 @@ public static class TileLoader
 		tiles.Clear();
 		globalTiles.Clear();
 		tileTypeAndTileStyleToItemType.Clear();
+		Animation.Unload();
 		tileConversionDelegates = null;
 
 		// Has to be ran on the main thread, since this may dispose textures.
@@ -293,7 +301,7 @@ public static class TileLoader
 	//  and add && !checkStay to if statement that sets flag4
 	public static void CheckModTile(int i, int j, int type)
 	{
-		if(type <= TileID.Count) {
+		if (type <= TileID.Count) {
 			return;
 		}
 		if (WorldGen.destroyObject) {
@@ -877,6 +885,14 @@ public static class TileLoader
 		}
 	}
 
+	public static void EmitParticles(int i, int j, Tile tileCache, ushort typeCache, short tileFrameX, short tileFrameY, Color tileLight, bool visible)
+	{
+		foreach (var hook in HookEmitParticles) {
+			hook(i, j, tileCache, typeCache, tileFrameX, tileFrameY, tileLight, visible);
+		}
+		GetTile(typeCache)?.EmitParticles(i, j, tileCache, tileFrameX, tileFrameY, tileLight, visible);
+	}
+
 	public static void PostDraw(int i, int j, int type, SpriteBatch spriteBatch)
 	{
 		// TODO: Pass in TileDrawInfo so mods don't need to replicate existing SetDrawPositions logic. For example, ExampleTorch repeated logic (SetDrawPositions/PostDraw)
@@ -896,6 +912,25 @@ public static class TileLoader
 
 		foreach (var hook in HookSpecialDraw) {
 			hook(specialTileX, specialTileY, type, spriteBatch);
+		}
+	}
+
+	public static bool PreDrawPlacementPreview(int i, int j, int type, SpriteBatch spriteBatch, ref Rectangle frame, ref Vector2 position, ref Color color, bool validPlacement, ref SpriteEffects spriteEffects)
+	{
+		foreach (var hook in HookPreDrawPlacementPreview) {
+			if (!hook(i, j, type, spriteBatch, ref frame, ref position, ref color, validPlacement, ref spriteEffects)) {
+				return false;
+			}
+		}
+		return GetTile(type)?.PreDrawPlacementPreview(i, j, spriteBatch, ref frame, ref position, ref color, validPlacement, ref spriteEffects) ?? true;
+	}
+
+	public static void PostDrawPlacementPreview(int i, int j, int type, SpriteBatch spriteBatch, Rectangle frame, Vector2 position, Color color, bool validPlacement, SpriteEffects spriteEffects)
+	{
+		GetTile(type)?.PostDrawPlacementPreview(i, j, spriteBatch, frame, position, color, validPlacement, spriteEffects);
+
+		foreach (var hook in HookPostDrawPlacementPreview) {
+			hook(i, j, type, spriteBatch, frame, position, color, validPlacement, spriteEffects);
 		}
 	}
 

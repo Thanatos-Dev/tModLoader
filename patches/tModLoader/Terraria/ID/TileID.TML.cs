@@ -104,7 +104,7 @@ partial class TileID
 		public static bool[] CountsAsShimmerSource = Factory.CreateBoolSet();
 
 		/// <summary> Whether or not saplings count this tile as empty when trying to grow. </summary>
-		public static bool[] IgnoredByGrowingSaplings = Factory.CreateBoolSet(3, 24, 32, 61, 62, 69, 71, 73, 74, 82, 83, 84, 110, 113, 201, 233, 352, 485, 529, 530, 637, 655);
+		public static bool[] IgnoredByGrowingSaplings = Factory.CreateBoolSet(3, 24, 32, 61, 62, 69, 71, 73, 74, 82, 83, 84, 110, 113, 184, 201, 233, 352, 485, 529, 530, 637, 655);
 
 		/// <summary> Whether or not this tile prevents a meteor from landing near it.
 		/// <para/> Contains LihzahrdBrick, DisplayDoll, HatRack, FallenLog, and TeleportationPylon.
@@ -172,6 +172,7 @@ partial class TileID
 
 		/// <summary>
 		/// A version of <see cref="TileID.Sets.SwaysInWindBasic"/> that functions with multitiles. Causes the tile to sway along with the wind and player interaction.
+		/// <para/> <see cref="ModTile.AdjustMultiTileVineParameters(int, int, ref float?, ref float, ref float, ref bool, ref float, ref Microsoft.Xna.Framework.Graphics.Texture2D, ref Microsoft.Xna.Framework.Color)"/> can be used to customize how the tile sways with wind and player interaction.
 		/// <para/> <b>NOTE:</b> Requires calling <see cref="TileDrawing.AddSpecialPoint"/> in <c>ModTile.PreDraw</c> for the coordinates of the top left tile of the multitile. Use either
 		/// <see cref="TileDrawing.TileCounterType.MultiTileVine"/> or <see cref="TileDrawing.TileCounterType.MultiTileGrass"/>, depending on what kind of sway interaction you want.
 		/// </summary>
